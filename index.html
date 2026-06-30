@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donatshop Web App</title>
+    <!-- Telegram Web App Scripti -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Ikonkalar uchun FontAwesome kutubxonasi -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Umumiy sozlamalar */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121214; /* To'q, zamonaviy fon */
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 1. YUKLANISH EKRANI (SPLASH SCREEN) */
+        .loader-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #121214;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .logo-wrapper {
+            position: relative;
+            width: 130px; height: 130px;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 50%;
+            background: linear-gradient(0deg, transparent 0%, transparent 40%, #00ffcc 100%);
+            animation: rotateGlow 1.5s linear infinite;
+        }
+        .logo-wrapper::before {
+            content: ''; position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            background: #121214; border-radius: 50%;
+        }
+        .logo {
+            position: absolute;
+            width: 100px; height: 100px; border-radius: 50%;
+            background-image: url('https://picsum.photos/200'); /* O'z logongiz linki */
+            background-size: cover; background-position: center;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            animation: antiRotate 1.5s linear infinite;
+        }
+        .loading-text {
+            margin-top: 30px; font-size: 18px; font-weight: 500;
+            color: #00ffcc; text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+            animation: pulseText 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotateGlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes antiRotate { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes pulseText { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
+
+        /* 2. ASOSIY KONTENT VA SAHIFALAR */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 90px; /* Menyu to'sib qo'ymasligi uchun */
+            overflow-y: auto;
+            display: none; /* Boshida yashirin */
+        }
+        .page {
+            display: none; /* Sahifalar faqat aktiv bo'lganda ko'rinadi */
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* 3. PASTKI MENYU (NAVIGATION BAR) */
+        .nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            height: 70px;
+            background-color: #1a1a1f;
+            border-top: 1px solid #292932;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom); /* iPhone-lar uchun moslashuv */
+        }
+        .nav-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8a8a93;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 20%;
+            transition: color 0.2s ease;
+        }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        /* Aktiv menyu rangi (Rasmda yashil rang ekan, yashil qildim, xohlasangiz neon sarg'ish qilish mumkin) */
+        .nav-item.active {
+            color: #4cd964; 
+        }
+
+        /* 4. YANGILIKLAR UCHUN QIZIL NUQTA (BADGE) */
+        .badge {
+            position: absolute;
+            top: -2px;
+            right: 22px; /* Ikonka to'g'risida turishi uchun */
+            width: 8px;
+            height: 8px;
+            background-color: #ff3b30; /* Qizil rang */
+            border-radius: 50%;
+            box-shadow: 0 0 5px #ff3b30;
+            display: none; /* Boshida yashirin, kerak bo'lsa yoqiladi */
+        }
+        /* Nuqta borligini ko'rsatish uchun klass */
+        .nav-item.has-news .badge {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Yuklanish ekrani -->
+    <div class="loader-container" id="loader">
+        <div class="logo-wrapper"><div class="logo"></div></div>
+        <div class="loading-text">Yuklanmoqda...</div>
+    </div>
+
+    <!-- 2. Sahifalar kontenti -->
+    <div class="main-content" id="main-app">
+        
+        <!-- 1-Asosiy Sahifa -->
+        <div class="page active" id="page-home">
+            <h2>Asosiy sahifa</h2>
+            <p>Donatshop loyihasining bosh sahifasiga xush kelibsiz! Bu yerda eng muhim yangiliklar va kvestlar bo'ladi.</p>
+        </div>
+
+        <!-- 2-Telegram Kanallar -->
+        <div class="page" id="page-channels">
+            <h2>Telegram kanallar</h2>
+            <p>Bizning rasmiy kanallarimizga a'zo bo'ling va bonuslarga ega bo'ling:</p>
+            <!-- Bu yerga kanallar ro'yxatini qo'shasiz -->
+        </div>
+
+        <!-- 3-Profil -->
+        <div class="page" id="page-profile">
+            <h2>Mening profilim</h2>
+            <p>Foydalanuvchi ma'lumotlari, ID raqami va darajasi shu yerda ko'rinadi.</p>
+        </div>
+
+        <!-- 4-Buyurtmalar -->
+        <div class="page" id="page-orders">
+            <h2>Mening buyurtmalarim</h2>
+            <p>Siz sotib olgan barcha narsalar va donatlar shu bo'limga tushadi.</p>
+        </div>
+
+        <!-- 5-Hisobni to'ldirish -->
+        <div class="page" id="page-topup">
+            <h2>Hisobni to'ldirish</h2>
+            <p>Click, Payme yoki boshqa to'lov tizimlari orqali balansni to'ldirish bo'limi.</p>
+        </div>
+
+    </div>
+
+    <!-- 3. Pastki Navigatsiya menyusi -->
+    <div class="nav-bar" id="navbar">
+        <!-- Asosiy -->
+        <div class="nav-item active" onclick="switchPage('page-home', this)">
+            <i class="fa-solid fa-house"></i>
+            <span>Asosiy</span>
+            <div class="badge"></div>
+        </div>
+        <!-- Kanallar (has-news klassi borligi uchun qizil nuqta ko'rinadi) -->
+        <div class="nav-item has-news" onclick="switchPage('page-channels', this)">
+            <i class="fa-brands fa-telegram"></i>
+            <span>Kanallar</span>
+            <div class="badge"></div>
+        </div>
+        <!-- Profil -->
+        <div class="nav-item" onclick="switchPage('page-profile', this)">
+            <i class="fa-solid fa-user"></i>
+            <span>Profil</span>
+            <div class="badge"></div>
+        </div>
+        <!-- Buyurtmalar (has-news bor) -->
+        <div class="nav-item has-news" onclick="switchPage('page-orders', this)">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Buyurtmalar</span>
+            <div class="badge"></div>
+        </div>
+        <!-- Balans -->
+        <div class="nav-item" onclick="switchPage('page-topup', this)">
+            <i class="fa-solid fa-wallet"></i>
+            <span>To'ldirish</span>
+            <div class="badge"></div>
+        </div>
+    </div>
+
+    <script>
+        // Telegram Web App sozlamasi
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // 2.5 soniyadan keyin yuklanish ekranini yopish
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+        }, 2500);
+
+        // Sahifalarni almashtirish funksiyasi
+        function switchPage(pageId, element) {
+            // Hamma sahifalarni yashirish
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // Hamma menyu elementlaridan 'active' klassini olib tashlash
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            // Tanlangan sahifani ko'rsatish va menyuni aktiv qilish
+            document.getElementById(pageId).classList.add('active');
+            element.classList.add('active');
+
+            // Agar foydalanuvchi menyuga bossa, qizil nuqtani o'chirib yuborish (ixtiyoriy logika)
+            element.classList.remove('has-news');
+        }
+    </script>
+</body>
+</html>
