@@ -3,242 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donatshop Web App</title>
-    <!-- Telegram Web App Scripti -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Ikonkalar uchun FontAwesome kutubxonasi -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>Donatshop UZ</title>
     <style>
-        /* Umumiy sozlamalar */
-        body {
+        :root {
+            --bg-dark: #0a0a0f;
+            --card-bg: rgba(20, 20, 30, 0.6);
+            --metal-glow: rgba(0, 255, 204, 0.15);
+            --neon-blue: #00ffff;
+            --neon-purple: #bd00ff;
+            --text-main: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #121214; /* To'q, zamonaviy fon */
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 1. YUKLANISH EKRANI (SPLASH SCREEN) */
-        .loader-container {
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(189, 0, 255, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 255, 255, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* --- SPLASH SCREEN --- */
+        #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #121214;
+            background: #050508;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .logo-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .cyber-circle {
+            position: absolute;
+            width: 100%; height: 100%;
+            border: 4px solid transparent;
+            border-top-color: var(--neon-blue);
+            border-bottom-color: var(--neon-purple);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+        .logo-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- MAIN APP INTERFACE --- */
+        #app {
+            display: none;
+            padding: 15px;
+            padding-bottom: 90px;
+        }
+        header {
+            text-align: center;
+            margin: 15px 0 25px 0;
+        }
+        .brand-title {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, #8a99ad, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        /* --- TABS NAV (TOP) --- */
+        .category-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .nav-btn {
+            flex: 1;
+            background: linear-gradient(145deg, #181824, #10101a);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 12px;
+            color: #8a8a98;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-btn.active {
+            color: #fff;
+            border-color: rgba(0, 255, 255, 0.4);
+            box-shadow: inset 0 0 8px var(--metal-glow), 0 4px 15px rgba(0,255,255,0.1);
+            background: linear-gradient(145deg, #1c2438, #111622);
+        }
+
+        /* --- PRODUCTS GRID --- */
+        .page { display: none; }
+        .page.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Metallic Card Design */
+        .card {
+            background: linear-gradient(135deg, rgba(25, 25, 35, 0.65), rgba(15, 15, 22, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .card-img {
+            width: 55px;
+            height: 55px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .card-info {
+            font-size: 10px;
+            color: #8a8a98;
+            margin-bottom: 12px;
+            min-height: 28px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
         }
-        .logo-wrapper {
-            position: relative;
-            width: 130px; height: 130px;
-            display: flex; justify-content: center; align-items: center;
-            border-radius: 50%;
-            background: linear-gradient(0deg, transparent 0%, transparent 40%, #00ffcc 100%);
-            animation: rotateGlow 1.5s linear infinite;
+        .card-info.login-required { color: #ffbc00; }
+        .card-info.no-login { color: #00ffaa; }
+
+        .card-price {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--neon-blue);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
         }
-        .logo-wrapper::before {
-            content: ''; position: absolute;
-            top: 5px; left: 5px; right: 5px; bottom: 5px;
-            background: #121214; border-radius: 50%;
+        .select-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #ced9e5 0%, #9caab8 100%);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            color: #11151d;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: 0.2s;
         }
-        .logo {
-            position: absolute;
-            width: 100px; height: 100px; border-radius: 50%;
-            background-image: url('https://picsum.photos/200'); /* O'z logongiz linki */
-            background-size: cover; background-position: center;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-            animation: antiRotate 1.5s linear infinite;
-        }
-        .loading-text {
-            margin-top: 30px; font-size: 18px; font-weight: 500;
-            color: #00ffcc; text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-            animation: pulseText 1.5s ease-in-out infinite;
+        .select-btn:active {
+            transform: scale(0.97);
+            background: linear-gradient(180deg, #9caab8 0%, #ced9e5 100%);
         }
 
-        @keyframes rotateGlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes antiRotate { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
-        @keyframes pulseText { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
-
-        /* 2. ASOSIY KONTENT VA SAHIFALAR */
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            padding-bottom: 90px; /* Menyu to'sib qo'ymasligi uchun */
-            overflow-y: auto;
-            display: none; /* Boshida yashirin */
-        }
-        .page {
-            display: none; /* Sahifalar faqat aktiv bo'lganda ko'rinadi */
-        }
-        .page.active {
-            display: block;
-        }
-
-        /* 3. PASTKI MENYU (NAVIGATION BAR) */
-        .nav-bar {
+        /* --- BOTTOM BAR --- */
+        .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
             height: 70px;
-            background-color: #1a1a1f;
-            border-top: 1px solid #292932;
+            background: rgba(10, 10, 15, 0.85);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            padding-bottom: env(safe-area-inset-bottom); /* iPhone-lar uchun moslashuv */
         }
-        .nav-item {
-            position: relative;
+        .bottom-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #8a8a93;
-            text-decoration: none;
+            color: #5c5c6d;
             font-size: 11px;
+            text-decoration: none;
             font-weight: 500;
-            cursor: pointer;
-            width: 20%;
-            transition: color 0.2s ease;
         }
-        .nav-item i {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        /* Aktiv menyu rangi (Rasmda yashil rang ekan, yashil qildim, xohlasangiz neon sarg'ish qilish mumkin) */
-        .nav-item.active {
-            color: #4cd964; 
-        }
-
-        /* 4. YANGILIKLAR UCHUN QIZIL NUQTA (BADGE) */
-        .badge {
-            position: absolute;
-            top: -2px;
-            right: 22px; /* Ikonka to'g'risida turishi uchun */
-            width: 8px;
-            height: 8px;
-            background-color: #ff3b30; /* Qizil rang */
-            border-radius: 50%;
-            box-shadow: 0 0 5px #ff3b30;
-            display: none; /* Boshida yashirin, kerak bo'lsa yoqiladi */
-        }
-        /* Nuqta borligini ko'rsatish uchun klass */
-        .nav-item.has-news .badge {
-            display: block;
-        }
+        .bottom-item.active { color: var(--neon-blue); }
+        .bottom-icon { font-size: 20px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <!-- 1. Yuklanish ekrani -->
-    <div class="loader-container" id="loader">
-        <div class="logo-wrapper"><div class="logo"></div></div>
-        <div class="loading-text">Yuklanmoqda...</div>
+    <!-- Splash Screen -->
+    <div id="splash">
+        <div class="logo-container">
+            <div class="cyber-circle"></div>
+            <div class="logo-text">💎</div>
+        </div>
+        <h2 style="letter-spacing: 3px; font-weight: 800; font-size: 18px; color: #fff;">DONATSHOP UZ</h2>
+        <p style="color: #5c5c6d; font-size: 12px; margin-top: 5px;">Yuklanmoqda...</p>
     </div>
 
-    <!-- 2. Sahifalar kontenti -->
-    <div class="main-content" id="main-app">
-        
-        <!-- 1-Asosiy Sahifa -->
-        <div class="page active" id="page-home">
-            <h2>Asosiy sahifa</h2>
-            <p>Donatshop loyihasining bosh sahifasiga xush kelibsiz! Bu yerda eng muhim yangiliklar va kvestlar bo'ladi.</p>
+    <!-- Main App -->
+    <div id="app">
+        <header>
+            <h1 class="brand-title">DONATSHOP UZ</h1>
+        </header>
+
+        <!-- Top Categories -->
+        <div class="category-nav">
+            <button class="nav-btn active" onclick="switchCategory('premium', this)">⭐ TG Premium</button>
+            <button class="nav-btn" onclick="switchCategory('uc', this)">🔴 PUBG UC</button>
         </div>
 
-        <!-- 2-Telegram Kanallar -->
-        <div class="page" id="page-channels">
-            <h2>Telegram kanallar</h2>
-            <p>Bizning rasmiy kanallarimizga a'zo bo'ling va bonuslarga ega bo'ling:</p>
-            <!-- Bu yerga kanallar ro'yxatini qo'shasiz -->
+        <!-- TELEGRAM PREMIUM PAGE -->
+        <div id="premium" class="page active">
+            <!-- 1 oylik -->
+            <div class="card">
+                <div class="card-title">1 oylik Premium</div>
+                <div class="card-info login-required">Akkauntga kirib olinadi ➡️</div>
+                <div class="card-price">45.000 so’m</div>
+                <button class="select-btn" onclick="buyItem('Premium 1 oy (Kirib)', '45.000')">Tanlash</button>
+            </div>
+            <!-- 3 oylik -->
+            <div class="card">
+                <div class="card-title">3 oylik Premium</div>
+                <div class="card-info no-login">Akkauntga kirilmaydi ❌</div>
+                <div class="card-price">160.000 so’m</div>
+                <button class="select-btn" onclick="buyItem('Premium 3 oy (Kirilmaydi)', '160.000')">Tanlash</button>
+            </div>
+            <!-- 6 oylik -->
+            <div class="card">
+                <div class="card-title">6 oylik Premium</div>
+                <div class="card-info no-login">Akkauntga kirilmaydi ❌</div>
+                <div class="card-price">220.000 so’m</div>
+                <button class="select-btn" onclick="buyItem('Premium 6 oy (Kirilmaydi)', '220.000')">Tanlash</button>
+            </div>
+            <!-- 1 yillik kirib -->
+            <div class="card">
+                <div class="card-title">1 yillik Premium</div>
+                <div class="card-info login-required">Akkauntga kirib olinadi ➡️</div>
+                <div class="card-price">290.000 so’m</div>
+                <button class="select-btn" onclick="buyItem('Premium 1 yil (Kirib)', '290.000')">Tanlash</button>
+            </div>
+            <!-- 1 yillik kirilmasdan -->
+            <div class="card">
+                <div class="card-title">1 yillik Premium</div>
+                <div class="card-info no-login">Akkauntga kirilmaydi ❌</div>
+                <div class="card-price">350.000 so’m</div>
+                <button class="select-btn" onclick="buyItem('Premium 1 yil (Kirilmaydi)', '350.000')">Tanlash</button>
+            </div>
         </div>
 
-        <!-- 3-Profil -->
-        <div class="page" id="page-profile">
-            <h2>Mening profilim</h2>
-            <p>Foydalanuvchi ma'lumotlari, ID raqami va darajasi shu yerda ko'rinadi.</p>
+        <!-- PUBG UC PAGE -->
+        <div id="uc" class="page">
+            <div class="card">
+                <div class="card-title">60 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">11.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('60 UC', '11.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">120 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">22.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('120 UC', '22.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">180 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">33.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('180 UC', '33.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">325 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">56.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('325 UC', '56.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">385 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">68.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('385 UC', '68.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">660 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">110.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('660 UC', '110.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">720 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">130.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('720 UC', '130.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">985 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">180.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('985 UC', '180.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">1320 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">230.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('1320 UC', '230.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">1800 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">290.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('1800 UC', '290.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">2125 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">360.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('2125 UC', '360.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">2460 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">400.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('2460 UC', '400.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">3850 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">580.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('3850 UC', '580.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">5650 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">870.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('5650 UC', '870.000')">Tanlash</button>
+            </div>
+            <div class="card">
+                <div class="card-title">8100 UC</div>
+                <div class="card-info">ID orqali tezkor</div>
+                <div class="card-price">1.150.000 so'm</div>
+                <button class="select-btn" onclick="buyItem('8100 UC', '1.150.000')">Tanlash</button>
+            </div>
         </div>
-
-        <!-- 4-Buyurtmalar -->
-        <div class="page" id="page-orders">
-            <h2>Mening buyurtmalarim</h2>
-            <p>Siz sotib olgan barcha narsalar va donatlar shu bo'limga tushadi.</p>
-        </div>
-
-        <!-- 5-Hisobni to'ldirish -->
-        <div class="page" id="page-topup">
-            <h2>Hisobni to'ldirish</h2>
-            <p>Click, Payme yoki boshqa to'lov tizimlari orqali balansni to'ldirish bo'limi.</p>
-        </div>
-
     </div>
 
-    <!-- 3. Pastki Navigatsiya menyusi -->
-    <div class="nav-bar" id="navbar">
-        <!-- Asosiy -->
-        <div class="nav-item active" onclick="switchPage('page-home', this)">
-            <i class="fa-solid fa-house"></i>
-            <span>Asosiy</span>
-            <div class="badge"></div>
-        </div>
-        <!-- Kanallar (has-news klassi borligi uchun qizil nuqta ko'rinadi) -->
-        <div class="nav-item has-news" onclick="switchPage('page-channels', this)">
-            <i class="fa-brands fa-telegram"></i>
-            <span>Kanallar</span>
-            <div class="badge"></div>
-        </div>
-        <!-- Profil -->
-        <div class="nav-item" onclick="switchPage('page-profile', this)">
-            <i class="fa-solid fa-user"></i>
-            <span>Profil</span>
-            <div class="badge"></div>
-        </div>
-        <!-- Buyurtmalar (has-news bor) -->
-        <div class="nav-item has-news" onclick="switchPage('page-orders', this)">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <span>Buyurtmalar</span>
-            <div class="badge"></div>
-        </div>
-        <!-- Balans -->
-        <div class="nav-item" onclick="switchPage('page-topup', this)">
-            <i class="fa-solid fa-wallet"></i>
-            <span>To'ldirish</span>
-            <div class="badge"></div>
-        </div>
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a href="#" class="bottom-item active"><span class="bottom-icon">🛍️</span>Do'kon</a>
+        <a href="#" class="bottom-item"><span class="bottom-icon">👤</span>Profil</a>
+        <a href="#" class="bottom-item"><span class="bottom-icon">📜</span>Tarix</a>
+        <a href="#" class="bottom-item"><span class="bottom-icon">ℹ️</span>Yordam</a>
     </div>
 
     <script>
-        // Telegram Web App sozlamasi
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // 2.5 soniyadan keyin yuklanish ekranini yopish
+        // Splash screen timeout
         setTimeout(() => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-        }, 2500);
+            const splash = document.getElementById('splash');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            }, 500);
+        }, 2000);
 
-        // Sahifalarni almashtirish funksiyasi
-        function switchPage(pageId, element) {
-            // Hamma sahifalarni yashirish
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => page.classList.remove('active'));
-
-            // Hamma menyu elementlaridan 'active' klassini olib tashlash
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-
-            // Tanlangan sahifani ko'rsatish va menyuni aktiv qilish
-            document.getElementById(pageId).classList.add('active');
+        // Switch category function
+        function switchCategory(categoryId, element) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(categoryId).classList.add('active');
             element.classList.add('active');
+        }
 
-            // Agar foydalanuvchi menyuga bossa, qizil nuqtani o'chirib yuborish (ixtiyoriy logika)
-            element.classList.remove('has-news');
+        // Buy Action placeholder
+        function buyItem(name, price) {
+            alert(name + " tanlandi. Narxi: " + price + " so'm. Sotib olish tizimi tez kunda botga integratsiya qilinadi.");
         }
     </script>
 </body>
-</html>
+                    </html>
+    
