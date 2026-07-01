@@ -36,86 +36,68 @@
             width: 100vw;
         }
 
-        /* --- FUTURISTIK Y2K KIRISH EFEKTI (SPLASH SCREEN) --- */
+        /* --- SIZ AYTGAN PINTEREST VIDEO KIRISH EFEKTI (5 SEKUND) --- */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #030305;
+            background: #000000; /* Video qora fonda yaxshi chiqishi uchun */
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             opacity: 1;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .cyber-loader {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin-bottom: 25px;
+        /* Video konteyneri va o'lchami */
+        .splash-video-container {
+            width: 180px;
+            height: 180px;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-radius: 50%; /* Dumaloq shaklda ochilishi uchun */
+            box-shadow: 0 0 35px rgba(0, 255, 255, 0.25);
         }
 
-        .outer-neon-ring {
-            position: absolute;
+        .splash-video-container video {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            border-left-color: var(--neon-blue);
-            border-right-color: var(--neon-purple);
-            filter: drop-shadow(0 0 15px var(--neon-blue));
-            animation: cyberSpin 1.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-        }
-
-        .inner-chrome-disk {
-            position: absolute;
-            width: 75%;
-            height: 75%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #111 0%, #222 30%, #555 50%, #222 70%, #111 100%);
-            border: 3px solid #8a99ad;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 255, 255, 0.3),
-                0 0 25px rgba(189, 0, 255, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: pulseMetal 1.5s ease-in-out infinite alternate;
-        }
-
-        .inner-chrome-disk::after {
-            content: '💎';
-            font-size: 36px;
-            filter: drop-shadow(0 0 10px var(--neon-blue));
-        }
-
-        @keyframes cyberSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes pulseMetal {
-            0% { transform: scale(0.95); }
-            100% { transform: scale(1.03); }
+            object-fit: cover;
+            mix-blend-mode: screen; /* Videodagi ortiqcha qoralikni yo'qotib kiber effekt beradi */
         }
 
         .loading-text {
-            font-size: 16px;
+            font-size: 25px;
             font-weight: 900;
             letter-spacing: 4px;
             color: #ffffff;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
 
-        /* --- ASOSIY ILOVA (BOSHIDA YASHIRIN BO'LADI) --- */
+        .sub-loading-text {
+            color: #8a99ad;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            animation: pulseText 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseText {
+            0% { opacity: 0.5; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
+            100% { opacity: 1; text-shadow: 0 0 10px var(--neon-blue); }
+        }
+
+        /* --- ASOSIY ILOVA INTERFEYSI --- */
         #app {
-            display: none; /* To'g'rilandi: Splash tugagach block/flex bo'ladi */
+            display: none;
             height: 100vh;
             flex-direction: column;
             width: 100%;
@@ -135,7 +117,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* --- SAHIFALAR KONTEYNERI (SLIDE ANIMATSIYA) --- */
+        /* --- SAHIFALAR KONTEYNERI --- */
         .pages-container {
             flex: 1;
             position: relative;
@@ -252,7 +234,7 @@
             color: #5c5c6d;
         }
 
-        /* --- BOTTOM NAV BAR --- */
+        /* --- PASTKI NAVIGATSIYA --- */
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
@@ -271,7 +253,7 @@
             align-items: center;
             justify-content: center;
             color: #5c5c6d;
-            font-size: 10px;
+            font-size: 11px;
             text-decoration: none;
             font-weight: 600;
             flex: 1;
@@ -279,7 +261,7 @@
             transition: color 0.3s ease;
         }
         .bottom-icon {
-            font-size: 21px;
+            font-size: 22px;
             margin-bottom: 4px;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -302,12 +284,13 @@
 <body>
 
     <div id="splash">
-        <div class="cyber-loader">
-            <div class="outer-neon-ring"></div>
-            <div class="inner-chrome-disk"></div>
+        <div class="splash-video-container">
+            <video autoplay loop muted playsinline>
+                <source src="https://v1.pinimg.com/videos/mc/720p/be/49/a0/be49a029ee628bf46fcb8f729f271914.mp4" type="video/mp4">
+            </video>
         </div>
         <div class="loading-text">DONATSHOP UZ</div>
-        <p style="color: #4a4a5a; font-size: 11px; margin-top: 8px; letter-spacing: 2px;">YUKLANMOQDA...</p>
+        <div class="sub-loading-text">Yuklanmoqda...</div>
     </div>
 
     <div id="app">
@@ -359,57 +342,49 @@
                 </div>
             </div>
 
-            <div id="page-aksiya" class="page">
-                <div class="full-section">
-                    <span style="font-size: 40px;">🔥</span>
-                    <h3 style="color:#fff; margin-top:10px;">Kiber Aksiyalar</h3>
-                    <p style="font-size:12px; margin-top:5px;">Hozirda faol aksiyalar mavjud emas.</p>
-                </div>
-            </div>
-
             <div id="page-profil" class="page">
                 <div class="full-section">
-                    <span style="font-size: 40px;">👑</span>
+                    <span style="font-size: 40px;">👤</span>
                     <h3 style="color:#fff; margin-top:10px;">Foydalanuvchi Profili</h3>
                     <p style="font-size:13px; color:var(--neon-blue); margin-top:8px;">ID: 5748392</p>
+                    <p style="font-size:12px; margin-top:5px;">Sizning darajangiz: Mijoz</p>
                 </div>
             </div>
 
-            <div id="page-ruykzak" class="page">
+            <div id="page-tarix" class="page">
                 <div class="full-section">
-                    <span style="font-size: 40px;">🎒</span>
-                    <h3 style="color:#fff; margin-top:10px;">Sizning Ruykzakingiz</h3>
-                    <p style="font-size:12px; margin-top:5px;">Hozircha ruykzak bo'sh.</p>
+                    <span style="font-size: 40px;">📜</span>
+                    <h3 style="color:#fff; margin-top:10px;">Xaridlar Tarixi</h3>
+                    <p style="font-size:12px; margin-top:5px;">Sizning buyurtmalaringiz ro'yxati bu yerda ko'rinadi.</p>
                 </div>
             </div>
 
-            <div id="page-hisob" class="page">
+            <div id="page-yordam" class="page">
                 <div class="full-section">
-                    <span style="font-size: 40px;">💳</span>
-                    <h3 style="color:#fff; margin-top:10px;">Shaxsiy Hisob</h3>
-                    <h2 style="color: #00ffaa; margin: 10px 0;">0 UZS</h2>
-                    <button class="select-btn" style="background:linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); color:#fff;">To'ldirish</button>
+                    <span style="font-size: 40px;">ℹ️</span>
+                    <h3 style="color:#fff; margin-top:10px;">Yordam markazi</h3>
+                    <p style="font-size:12px; margin-top:5px; margin-bottom: 15px;">Savollaringiz bo'lsa, texnik yordamga murojaat qiling.</p>
+                    <button class="select-btn" style="background:linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); color:#fff;">Adminga yozish</button>
                 </div>
             </div>
         </div>
 
         <div class="bottom-nav">
             <a href="#" class="bottom-item active" onclick="navigateTo('dukon', this)"><span class="bottom-icon">🛍️</span>Do'kon</a>
-            <a href="#" class="bottom-item" onclick="navigateTo('aksiya', this)"><span class="bottom-icon">🔥</span>Aksiya</a>
             <a href="#" class="bottom-item" onclick="navigateTo('profil', this)"><span class="bottom-icon">👤</span>Profil</a>
-            <a href="#" class="bottom-item" onclick="navigateTo('ruykzak', this)"><span class="bottom-icon">🎒</span>Ruykzak</a>
-            <a href="#" class="bottom-item" onclick="navigateTo('hisob', this)"><span class="bottom-icon">💳</span>Hisob</a>
+            <a href="#" class="bottom-item" onclick="navigateTo('tarix', this)"><span class="bottom-icon">📜</span>Tarix</a>
+            <a href="#" class="bottom-item" onclick="navigateTo('yordam', this)"><span class="bottom-icon">ℹ️</span>Yordam</a>
         </div>
     </div>
 
     <script>
-        // Telegram Web App tashabbusi
+        // Telegram Web App sozlamalari
         if (window.Telegram && window.Telegram.WebApp) {
             Telegram.WebApp.ready();
             Telegram.WebApp.expand();
         }
 
-        // Yuklanish tugagach ekranga chiqarish
+        // MAKSIMAL DARAJADA TO'G'RI 5 SONIYALIK KUTISH VA SILIQLASH
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
@@ -420,8 +395,8 @@
                 
                 setTimeout(() => {
                     if (splash) splash.style.display = 'none';
-                }, 500);
-            }, 2000); // 2 soniya ko'rinib turadi
+                }, 600);
+            }, 5000); // Rppa-rosa 5000 millisoniya (5 sekund) kutadi
         });
 
         function navigateTo(pageId, element) {
@@ -458,5 +433,5 @@
         }
     </script>
 </body>
-                    </html>
-                    
+    </html>
+    
