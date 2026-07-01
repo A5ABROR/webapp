@@ -31,7 +31,7 @@
             width: 100vw;
         }
 
-        /* --- 1. 3D PARTICLES SPLASH SCREEN (Kirish Efekti) --- */
+        /* --- 1. KIBER SPLASH SCREEN (Kirish Efekti) --- */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -42,7 +42,8 @@
             justify-content: center;
             align-items: center;
             opacity: 1;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
+            pointer-events: all;
         }
 
         #particle-canvas {
@@ -66,7 +67,7 @@
             width: 90px;
             height: 90px;
             background: rgba(255, 255, 255, 0.03);
-            border: 2px solid rgba(0, 255, 255, 0.3);
+            border: 2px solid rgba(0, 255, 230, 0.4);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -82,12 +83,12 @@
         }
 
         .splash-title {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
             letter-spacing: 4px;
             color: #ffffff;
             margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
         }
 
         .loading-text {
@@ -107,7 +108,7 @@
 
         /* --- ASOSIY ILOVA --- */
         #app {
-            display: none;
+            display: none; /* Dastlab yashirin turadi */
             height: 100vh;
             flex-direction: column;
             width: 100%;
@@ -134,7 +135,7 @@
             position: relative;
             overflow-y: auto;
             padding: 15px;
-            padding-bottom: 100px;
+            padding-bottom: 110px;
         }
 
         .page {
@@ -198,11 +199,6 @@
             width: 26px; height: 26px;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255, 215, 0, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .premium-badge:active {
-            transform: scale(1.2);
         }
 
         .card-title {
@@ -266,23 +262,19 @@
             position: relative;
             flex: 1;
             height: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .bottom-icon {
             font-size: 20px;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2;
         }
 
         .bottom-text {
-            opacity: 1;
             margin-top: 2px;
-            transition: all 0.3s;
-            z-index: 2;
+            font-size: 11px;
         }
 
-        /* Magic indicator active style */
         .bottom-item.active {
             color: var(--neon-blue);
         }
@@ -321,7 +313,7 @@
         .modal-close {
             position: absolute;
             top: 15px; right: 15px;
-            font-size: 18px;
+            font-size: 20px;
             color: #a0aec0;
             cursor: pointer;
         }
@@ -496,23 +488,25 @@
             <span class="modal-close" onclick="closeModal()">&times;</span>
             <div class="modal-icon">⭐</div>
             <div class="modal-title" id="modal-title">Tarif nomi</div>
-            <div class="modal-desc" id="modal-desc">Tarif haqida to'liq ma'lumotlar shu yerda paydo bo'ladi.</div>
+            <div class="modal-desc" id="modal-desc">Tarif haqida ma'lumot.</div>
             <button class="select-btn" onclick="closeModal()">Tushunarli</button>
         </div>
     </div>
 
     <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-        }
+        // Telegram Web App sozlamalari xavfsiz blok ichida
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+            }
+        } catch (e) { console.error(e); }
 
-        // --- 2-RASM: 3D PARTICLE CANVAS SPINNING SPHERE ANIMATION ---
+        // --- 2-RASM: MULTI-SYSTEM SPINNING SPHERE ANIMATION ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        const particleCount = 180;
-        let radius = 110;
+        let animationFrameId;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -529,14 +523,16 @@
             }
             update() {
                 this.theta += this.speed;
-                
+                let radius = Math.min(canvas.width, canvas.height) * 0.25;
+                if (radius > 120) radius = 120;
+
                 let x3d = radius * Math.sin(this.phi) * Math.cos(this.theta);
                 let y3d = radius * Math.sin(this.phi) * Math.sin(this.theta);
                 let z3d = radius * Math.cos(this.phi) + radius;
 
                 this.x = canvas.width / 2 + x3d;
-                this.y = canvas.height / 2 - 40 + y3d; 
-                this.size = (z3d / (radius * 2)) * 2.5 + 0.5;
+                this.y = canvas.height / 2 - 30 + y3d; 
+                this.size = (z3d / (radius * 2)) * 2.2 + 0.6;
                 this.alpha = (z3d / (radius * 2)) * 0.7 + 0.3;
             }
             draw() {
@@ -547,16 +543,14 @@
             }
         }
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
+        for (let i = 0; i < 120; i++) { particles.push(new Particle()); }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animate);
+            particles.forEach(p => { p.update(); p.draw(); });
+            animationFrameId = requestAnimationFrame(animate);
         }
-      
+        animate();
+
+        // 4 SEKUNDLIK PROGRESS BAR (Xavfsiz avtomatik ochilish bilan)
+       
