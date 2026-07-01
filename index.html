@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donatshop UZ</title>
+    <!-- Telegram Web App rasmiy skripti -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -36,11 +37,11 @@
             width: 100vw;
         }
 
-        /* --- SIZ AYTGAN PINTEREST VIDEO KIRISH EFEKTI (5 SEKUND) --- */
+        /* --- ANIME RASMLI SPLASH SCREEN (5 SEKUND + FOIZLAR) --- */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; /* Video qora fonda yaxshi chiqishi uchun */
+            background: #000000;
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -50,49 +51,57 @@
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Video konteyneri va o'lchami */
-        .splash-video-container {
+        /* Rasm konteyneri va uning qimirlash (pulsatsiya) animatsiyasi */
+        .splash-img-container {
             width: 180px;
-            height: 180px;
+            height: 280px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             overflow: hidden;
-            border-radius: 50%; /* Dumaloq shaklda ochilishi uchun */
-            box-shadow: 0 0 35px rgba(0, 255, 255, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(189, 0, 255, 0.25), inset 0 0 20px rgba(0,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: imageBreathe 3s ease-in-out infinite alternate;
         }
 
-        .splash-video-container video {
+        .splash-img-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            mix-blend-mode: screen; /* Videodagi ortiqcha qoralikni yo'qotib kiber effekt beradi */
         }
 
-        .loading-text {
-            font-size: 25px;
+        /* Nafrat olayotgandek yoki qimillayotgandek effekt */
+        @keyframes imageBreathe {
+            0% { transform: scale(1); filter: brightness(0.9) drop-shadow(0 0 10px rgba(0,255,255,0.2)); }
+            100% { transform: scale(1.04); filter: brightness(1.15) drop-shadow(0 0 25px rgba(189,0,255,0.4)); }
+        }
+
+        /* 1% dan 100% gacha to'ladigan foiz stili */
+        .loading-percentage {
+            font-size: 32px;
             font-weight: 900;
-            letter-spacing: 4px;
             color: #ffffff;
-            text-align: center;
-            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-            margin-bottom: 8px;
-            text-transform: uppercase;
+            font-family: monospace;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px var(--neon-blue);
+            margin-bottom: 5px;
         }
 
+        /* Uchib-yonadigan yuklanmoqda yozuvi */
         .sub-loading-text {
             color: #8a99ad;
-            font-size: 12px;
+            font-size: 13px;
             letter-spacing: 3px;
             text-transform: uppercase;
             font-weight: 700;
-            animation: pulseText 1.5s ease-in-out infinite alternate;
+            animation: textBlink 1.2s infinite;
         }
 
-        @keyframes pulseText {
-            0% { opacity: 0.5; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
-            100% { opacity: 1; text-shadow: 0 0 10px var(--neon-blue); }
+        @keyframes textBlink {
+            0%, 100% { opacity: 0.2; text-shadow: none; }
+            50% { opacity: 1; color: #fff; text-shadow: 0 0 10px var(--neon-purple); }
         }
 
         /* --- ASOSIY ILOVA INTERFEYSI --- */
@@ -283,22 +292,25 @@
 </head>
 <body>
 
+    <!-- SIZ AYTGAN ANIME RASMLI & 1%-100% FOIZLI SPLASH SCREEN -->
     <div id="splash">
-        <div class="splash-video-container">
-            <video autoplay loop muted playsinline>
-                <source src="https://v1.pinimg.com/videos/mc/720p/be/49/a0/be49a029ee628bf46fcb8f729f271914.mp4" type="video/mp4">
-            </video>
+        <div class="splash-img-container">
+            <!-- Siz yuborgan Makima anime rasmi -->
+            <img src="https://i.ibb.co/6R6YgYf4/12788.jpg" alt="Loading Image">
         </div>
-        <div class="loading-text">DONATSHOP UZ</div>
+        <!-- 1% dan 100% gacha sanaydigan joy -->
+        <div class="loading-percentage" id="upload-pct">1%</div>
         <div class="sub-loading-text">Yuklanmoqda...</div>
     </div>
 
+    <!-- MAIN APP -->
     <div id="app">
         <header>
             <h1 class="brand-title">DONATSHOP UZ</h1>
         </header>
 
         <div class="pages-container">
+            <!-- 1. DO'KON SAHIFASI -->
             <div id="page-dukon" class="page active">
                 <div class="category-nav">
                     <button class="nav-btn active" onclick="switchSubCategory('premium', this)">⭐ TG Premium</button>
@@ -342,6 +354,7 @@
                 </div>
             </div>
 
+            <!-- 2. PROFIL SAHIFASI -->
             <div id="page-profil" class="page">
                 <div class="full-section">
                     <span style="font-size: 40px;">👤</span>
@@ -351,6 +364,7 @@
                 </div>
             </div>
 
+            <!-- 3. TARIX SAHIFASI -->
             <div id="page-tarix" class="page">
                 <div class="full-section">
                     <span style="font-size: 40px;">📜</span>
@@ -359,6 +373,7 @@
                 </div>
             </div>
 
+            <!-- 4. YORDAM SAHIFASI -->
             <div id="page-yordam" class="page">
                 <div class="full-section">
                     <span style="font-size: 40px;">ℹ️</span>
@@ -369,6 +384,7 @@
             </div>
         </div>
 
+        <!-- PASTKI NAVIGATSIYA -->
         <div class="bottom-nav">
             <a href="#" class="bottom-item active" onclick="navigateTo('dukon', this)"><span class="bottom-icon">🛍️</span>Do'kon</a>
             <a href="#" class="bottom-item" onclick="navigateTo('profil', this)"><span class="bottom-icon">👤</span>Profil</a>
@@ -384,19 +400,31 @@
             Telegram.WebApp.expand();
         }
 
-        // MAKSIMAL DARAJADA TO'G'RI 5 SONIYALIK KUTISH VA SILIQLASH
+        // 5 SONIYA ICHIDA FOIZLARNI 1% DAN 100% GACHA SILLIQ KO'TARISH
         window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash');
-                const app = document.getElementById('app');
-                
-                if (splash) splash.style.opacity = '0';
-                if (app) app.style.display = 'flex';
-                
-                setTimeout(() => {
-                    if (splash) splash.style.display = 'none';
-                }, 600);
-            }, 5000); // Rppa-rosa 5000 millisoniya (5 sekund) kutadi
+            const pctElement = document.getElementById('upload-pct');
+            let currentPct = 1;
+            
+            // 5000ms / 100 = har 50ms da foiz bittaga ko'payadi
+            const interval = setInterval(() => {
+                if (currentPct >= 100) {
+                    clearInterval(interval);
+                    
+                    // 100% bo'lgach silliq ochish
+                    const splash = document.getElementById('splash');
+                    const app = document.getElementById('app');
+                    
+                    if (splash) splash.style.opacity = '0';
+                    if (app) app.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        if (splash) splash.style.display = 'none';
+                    }, 600);
+                } else {
+                    currentPct++;
+                    pctElement.innerText = currentPct + '%';
+                }
+            }, 47); // 47ms aniq 5 sekund atrofida yakunlaydi
         });
 
         function navigateTo(pageId, element) {
